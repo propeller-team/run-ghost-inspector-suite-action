@@ -35,7 +35,7 @@ const axios = require("axios");
         core.setOutput(
             "resultURLs",
             suiteResults
-                .every(
+                .map(
                     (suite) =>
                         `https://app.ghostinspector.com/suite-results/${suite.suiteResult}`
                 )
