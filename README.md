@@ -20,8 +20,8 @@ default: "300000"
 
 ## Outputs
 
-### `startURL`
-optional startURL for the test suite\
+### `resultURLs`
+The URLs of the suite(s) executed, delimited by newline\
 default: ''
 
 ### `maxTimeout`
