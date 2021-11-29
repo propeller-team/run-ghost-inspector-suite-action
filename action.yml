@@ -4,10 +4,10 @@ branding:
   icon: 'check'
   color: 'green'
 inputs:
-  startURL:
-    description: 'optional startURL for the test suite'
-    required: false
-    default: ''
+  vercelPreviewURL:
+    description: 'Vercel preview URL, including https://'
+    required: true
+    default: 'UNDEFINED'
   suiteID:
     description: 'ghost inspector suiteID'
     required: true
@@ -20,7 +20,11 @@ inputs:
     description: 'ghost inspector API Key'
     required: true
     default: 'UNDEFINED'
-
+outputs:
+  resultURLs:
+    description: 'The URLs of the suite(s) executed, delimited by newline'
+  passed:
+    description: '(boolean) whether the test passed'
 runs:
   using: 'node12'
   main: 'index.js'

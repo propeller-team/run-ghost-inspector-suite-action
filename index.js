@@ -1,44 +1,53 @@
-const core = require('@actions/core');
-const github = require('@actions/github');
-const axios = require('axios');
+const core = require("@actions/core");
+const axios = require("axios");
 
-(async function(){
-    const GHOST_INSPECTOR_API_KEY = core.getInput('GHOST_INSPECTOR_API_KEY');
+(async function () {
+    // get inputs
+    const GHOST_INSPECTOR_API_KEY = core.getInput("GHOST_INSPECTOR_API_KEY");
+    const suiteID = core.getInput("suiteID");
+    const vercelPreviewURL = core.getInput("vercelPreviewURL");
 
-    const requiredFieldNames = ['suiteID','GHOST_INSPECTOR_API_KEY'];
-
-    requiredFieldNames.forEach((fieldName) =>{
-        if(!core.getInput(fieldName)){
+    // validate input
+    const requiredFieldNames = [
+        "suiteID",
+        "GHOST_INSPECTOR_API_KEY",
+        "vercelPreviewURL",
+    ];
+    requiredFieldNames.forEach((fieldName) => {
+        if (!core.getInput(fieldName)) {
             core.setFailed(`required field "${fieldName}" is missing`);
         }
-    })
-
-    async function getSuiteResult(suiteID,startURL){
-        const requestConfig = {timeout: parseInt(core.getInput('maxTimeout') || 300000)} //default timeout of 5min
-        const startURLQueryParam = startURL ? `&startUrl=${startURL}` : "";
-        const response = await axios.get(`https://api.ghostinspector.com/v1/suites/${suiteID}/execute/?apiKey=${GHOST_INSPECTOR_API_KEY}${startURLQueryParam}`,requestConfig)
-        return response.data.data;
-    }
-
-    function areAllTestsSuccessful(suiteResult){
-        const allTestResults = suiteResult.map((test) => {
-            return test.passing && test.screenshotComparePassing
-        })
-        return !allTestResults.includes(false)
-    }
+    });
 
     try {
-        const startURL = core.getInput('startURL');
-        const suiteID = core.getInput('suiteID');
+        // make API request, get results
+        const requestConfig = {
+            timeout: parseInt(core.getInput("maxTimeout") || 300000),
+        }; //default timeout of 5min
+        const startURLQueryParam = `&base-url=${vercelPreviewURL}`;
+        const response = await axios.get(
+            `https://api.ghostinspector.com/v1/suites/${suiteID}/execute/?apiKey=${GHOST_INSPECTOR_API_KEY}${startURLQueryParam}`,
+            requestConfig
+        );
+        const suiteResults = response.data.data;
 
-        const suiteResult = await getSuiteResult(suiteID,startURL);
-
-        if(areAllTestsSuccessful(suiteResult)){
-            core.setOutput("SUCCESS","All test were successful (including screenshot comparison)");
-        }else {
-            core.setFailed(`At least one test failed. Check out https://app.ghostinspector.com/suites/${suiteID} for more details`);
-        }
+        // set output variables
+        core.setOutput(
+            "resultURLs",
+            suiteResults
+                .every(
+                    (suite) =>
+                        `https://app.ghostinspector.com/suite-results/${suite.suiteResult}`
+                )
+                .join("\n")
+        );
+        core.setOutput(
+            "passed",
+            suiteResults.every((suite) => {
+                return suite.passing; // && test.screenshotComparePassing
+            })
+        );
     } catch (error) {
         core.setFailed(error.message);
     }
-}())
+})();

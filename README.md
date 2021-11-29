@@ -4,16 +4,21 @@ Run a Ghost Inspector Suite that only passes if both assertions and screenshots 
 
 ## Inputs
 
-
-
 ### `suiteID`
 **Required** ghost inspector suiteID.\
-*If you want to get a link to the suite after tests are failing you should add this as a literal string and not as a secret.* \
-default: 'UNDEFINED'
 
 ### `GHOST_INSPECTOR_API_KEY`
 **Required** ghost inspector API Key\
-default: 'UNDEFINED'
+
+### `vercelPreviewURL`
+**Required** Vercel preview URL, including `https://`
+
+### `maxTimeout`
+optional timeout in milliseconds. how long to wait for tests results before failing\
+default: "300000"
+
+
+## Outputs
 
 ### `startURL`
 optional startURL for the test suite\
@@ -24,16 +29,12 @@ optional timeout in milliseconds. how long to wait for tests results before fail
 default: "300000"
 
 
-## Outputs
-This Action doesn't have any output yet.
-
-
 ## Example usage
 
 ```yml
-uses: DATADEER/run-ghost-inspector-suite-action@v1.2
+uses: propeller-team/run-ghost-inspector-suite-action@v1.0.1
 with:
-  suiteID: "XXXXXXXXXXXXXXXXXXXXXXX" # don't import from secrets. needs to visible in logs
-  startURL: "https://google.com"
+  suiteID: ${{ secrets.GHOST_INSPECTOR_SUITE_ID }}
+  vercelPreviewURL: "https://xxxx.vercel.app"
   GHOST_INSPECTOR_API_KEY: ${{ secrets.GHOST_INSPECTOR_API_KEY }}
 ```
