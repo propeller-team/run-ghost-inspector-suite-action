@@ -47,6 +47,11 @@ const axios = require("axios");
             "passed",
             suiteResults.every((test) => test.passing)
         );
+        core.info(
+            `passed = ${suiteResults.every(
+                (test) => test.passing
+            )} ${JSON.stringify(suiteResults)}`
+        );
     } catch (error) {
         core.setFailed(error.message);
     }
