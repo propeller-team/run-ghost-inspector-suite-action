@@ -32,6 +32,7 @@ const axios = require("axios");
         const suiteResults = response.data.data;
 
         // set output variables
+        core.info(suiteResults);
         core.setOutput(
             "resultURLs",
             suiteResults
