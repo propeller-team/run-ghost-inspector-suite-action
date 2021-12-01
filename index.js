@@ -32,21 +32,20 @@ const axios = require("axios");
         const suiteResults = response.data.data;
 
         // set output variables
-        core.info(JSON.stringify(suiteResults, null, 4));
         core.setOutput(
             "resultURLs",
             suiteResults
                 .map(
-                    (suite) =>
-                        `https://app.ghostinspector.com/suite-results/${suite.suiteResult}`
+                    (test) =>
+                        `${
+                            test.passing ? "✅" : "❌"
+                        } https://app.ghostinspector.com/results/${test._id}`
                 )
                 .join("\n")
         );
         core.setOutput(
             "passed",
-            suiteResults.every((suite) => {
-                return suite.passing; // && test.screenshotComparePassing
-            })
+            suiteResults.every((test) => test.passing)
         );
     } catch (error) {
         core.setFailed(error.message);
